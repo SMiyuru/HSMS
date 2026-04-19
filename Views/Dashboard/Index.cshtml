@@ -1,0 +1,226 @@
+@{
+    ViewData["Title"] = "Dashboard";
+    var todaySales = ViewBag.TodaySales;
+    var todayOrders = ViewBag.TodayOrders;
+    var lowStockCount = ViewBag.LowStockCount;
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="container-fluid">
+    <h2 class="mb-4">Dashboard</h2>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Today's Sales</h5>
+                    <h2 class="mb-0">Rs. @todaySales?.ToString("N2")</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Today's Orders</h5>
+                    <h2 class="mb-0">@todayOrders</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Low Stock Items</h5>
+                    <h2 class="mb-0">@lowStockCount</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Active User</h5>
+                    <h2 class="mb-0" style="font-size: 1.2rem;">@User.Identity.Name</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Sales Trend (Last 7 Days)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="salesChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Sales by Category</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Low Stock Products</h5>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.LowStockProducts != null && ((List<HSMS.Models.Product>)ViewBag.LowStockProducts).Any())
+                    {
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>Stock</th>
+                                    <th>Reorder</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var product in (List<HSMS.Models.Product>)ViewBag.LowStockProducts)
+                                {
+                                    <tr>
+                                        <td>@product.Code</td>
+                                        <td>@product.Name</td>
+                                        <td class="text-danger fw-bold">@product.CurrentStock</td>
+                                        <td>@product.ReorderLevel</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No low stock products</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Top Selling Products</h5>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.TopProducts != null && ((List<HSMS.Models.Product>)ViewBag.TopProducts).Any())
+                    {
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Category</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var product in (List<HSMS.Models.Product>)ViewBag.TopProducts)
+                                {
+                                    <tr>
+                                        <td>@product.Name</td>
+                                        <td>@product.Category?.Name</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No sales data yet</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Quick Links</h5>
+                </div>
+                <div class="card-body">
+                    <a asp-controller="Products" asp-action="Create" class="btn btn-primary">Add Product</a>
+                    <a asp-controller="Sales" asp-action="Counter" class="btn btn-success">Counter POS</a>
+                    <a asp-controller="Reports" asp-action="Index" class="btn btn-info">Reports</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var salesLabels = @Html.Raw(Json.Serialize(ViewBag.SalesLabels));
+    var salesData = @Html.Raw(Json.Serialize(ViewBag.SalesData));
+    var orderCount = @Html.Raw(Json.Serialize(ViewBag.OrderCount));
+
+    var ctx = document.getElementById('salesChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: salesLabels,
+            datasets: [{
+                label: 'Sales (Rs.)',
+                data: salesData,
+                borderColor: 'rgb(54, 162, 235)',
+                backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                fill: true,
+                tension: 0.3
+            }, {
+                label: 'Orders',
+                data: orderCount,
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                fill: true,
+                tension: 0.3,
+                yAxisID: 'y1'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: { display: true, text: 'Sales (Rs.)' }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: { display: true, text: 'Orders' }
+                }
+            }
+        }
+    });
+
+    var categoryLabels = @Html.Raw(Json.Serialize(ViewBag.CategoryLabels));
+    var categoryData = @Html.Raw(Json.Serialize(ViewBag.CategoryData));
+    var colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
+
+    var ctx2 = document.getElementById('categoryChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+            labels: categoryLabels,
+            datasets: [{
+                data: categoryData,
+                backgroundColor: colors
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+</script>

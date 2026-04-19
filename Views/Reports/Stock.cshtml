@@ -1,0 +1,53 @@
+@model List<HSMS.Models.Product>
+@{
+    ViewData["Title"] = "Stock Report";
+}
+
+<div class="container-fluid">
+    <h2 class="mb-4">Stock Report</h2>
+    
+    <div class="mb-3">
+        <a asp-action="ExportToExcel" asp-route-type="Stock" class="btn btn-success">Export to Excel</a>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Purchase Price</th>
+                <th>Selling Price</th>
+                <th>Current Stock</th>
+                <th>Stock Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var totalValue = 0m;
+                var totalStock = 0;
+            }
+            @foreach (var product in Model)
+            {
+                totalValue += product.SellingPrice * product.CurrentStock;
+                totalStock += product.CurrentStock;
+                <tr>
+                    <td>@product.Code</td>
+                    <td>@product.Name</td>
+                    <td>@product.Category?.Name</td>
+                    <td>Rs. @product.PurchasePrice.ToString("N2")</td>
+                    <td>Rs. @product.SellingPrice.ToString("N2")</td>
+                    <td>@product.CurrentStock</td>
+                    <td>Rs. @(product.SellingPrice * product.CurrentStock).ToString("N2")</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr class="fw-bold">
+                <td colspan="5">Total</td>
+                <td>@totalStock</td>
+                <td>Rs. @totalValue.ToString("N2")</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

@@ -1,0 +1,66 @@
+@model HSMS.Models.Product
+@{
+    ViewData["Title"] = "Product Details";
+    var imgUrl = Model.ImageUrl;
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<div class="container" style="max-width: 600px;">
+    <div class="card">
+        <div class="card-header">
+            <h4>Product Details</h4>
+        </div>
+        <div class="card-body">
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <div class="text-center mb-3">
+                    <div class="mb-2 text-muted small">Path: @Model.ImageUrl</div>
+                    <img src="@Url.Content(Model.ImageUrl)" alt="@Model.Name" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
+                </div>
+            }
+            else
+            {
+                <div class="text-center mb-3 text-muted">No image</div>
+            }
+            <table class="table table-borderless">
+                <tr>
+                    <th width="40%">Code:</th>
+                    <td>@Model.Code</td>
+                </tr>
+                <tr>
+                    <th>Name:</th>
+                    <td>@Model.Name</td>
+                </tr>
+                <tr>
+                    <th>Category:</th>
+                    <td>@Model.Category?.Name</td>
+                </tr>
+                <tr>
+                    <th>Purchase Price:</th>
+                    <td>Rs. @Model.PurchasePrice.ToString("N2")</td>
+                </tr>
+                <tr>
+                    <th>Selling Price:</th>
+                    <td>Rs. @Model.SellingPrice.ToString("N2")</td>
+                </tr>
+                <tr>
+                    <th>Current Stock:</th>
+                    <td>@Model.CurrentStock</td>
+                </tr>
+                <tr>
+                    <th>Reorder Level:</th>
+                    <td>@Model.ReorderLevel</td>
+                </tr>
+                <tr>
+                    <th>Supplier:</th>
+                    <td>@Model.Supplier?.Name</td>
+                </tr>
+            </table>
+        </div>
+        <div class="card-footer">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
+</div>

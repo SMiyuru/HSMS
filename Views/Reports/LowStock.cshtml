@@ -1,0 +1,34 @@
+@model List<HSMS.Models.Product>
+@{
+    ViewData["Title"] = "Low Stock Report";
+}
+
+<div class="container-fluid">
+    <h2 class="mb-4">Low Stock Alert Report</h2>
+
+    <table class="table table-striped table-danger">
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Current Stock</th>
+                <th>Reorder Level</th>
+                <th>Shortage</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in Model)
+            {
+                <tr>
+                    <td>@product.Code</td>
+                    <td>@product.Name</td>
+                    <td>@product.Category?.Name</td>
+                    <td class="text-danger fw-bold">@product.CurrentStock</td>
+                    <td>@product.ReorderLevel</td>
+                    <td class="text-danger">@(product.ReorderLevel - product.CurrentStock)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

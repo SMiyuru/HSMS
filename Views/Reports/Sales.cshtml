@@ -1,0 +1,128 @@
+@{
+    ViewData["Title"] = ViewBag.Title as string ?? "Sales Report";
+}
+
+<div class="container-fluid">
+    <h2 class="mb-4">@ViewBag.Title</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <select name="type" class="form-select">
+                        <option value="daily" selected>Daily Report</option>
+                        <option value="monthly">Monthly Report</option>
+                        <option value="custom">Custom Date Range</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="date" name="startDate" class="form-control" value="@DateTime.Today:yyyy-MM-dd">
+                </div>
+                <div class="col-md-3">
+                    <input type="date" name="endDate" class="form-control" value="@DateTime.Today:yyyy-MM-dd">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary">Generate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (ViewBag.Report != null)
+    {
+        var report = ViewBag.Report as Dictionary<string, decimal>;
+        if (report != null)
+        {
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <h5>Total Orders</h5>
+                            <h3>@report["TotalOrders"]</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <h5>Total Revenue</h5>
+                            <h3>Rs. @report["TotalRevenue"].ToString("N2")</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <h5>Total Discount</h5>
+                            <h3>Rs. @report["TotalDiscount"].ToString("N2")</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <h5>Total Tax</h5>
+                            <h3>Rs. @report["TotalTax"].ToString("N2")</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">Cash Payments</div>
+                        <div class="card-body">
+                            <h4>Rs. @report["CashPayments"].ToString("N2")</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">Card Payments</div>
+                        <div class="card-body">
+                            <h4>Rs. @report["CardPayments"].ToString("N2")</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">COD Payments</div>
+                        <div class="card-body">
+                            <h4>Rs. @report["CODPayments"].ToString("N2")</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+
+    @if (ViewBag.Orders != null)
+    {
+        <table class="table table-striped mt-4">
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Date</th>
+                    <th>Customer</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Payment</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in (List<HSMS.Models.Order>)ViewBag.Orders)
+                {
+                    <tr>
+                        <td>@order.OrderNumber</td>
+                        <td>@order.CreatedAt:yyyy-MM-dd HH:mm</td>
+                        <td>@order.Customer?.FullName</td>
+                        <td>Rs. @order.FinalAmount.ToString("N2")</td>
+                        <td>@order.Status</td>
+                        <td>@order.PaymentMethod</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
