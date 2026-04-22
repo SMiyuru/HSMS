@@ -1,5 +1,11 @@
 @{
     ViewData["Title"] = ViewBag.Title as string ?? "Sales Report";
+    var pageNo = Convert.ToInt32(ViewContext.RouteData.Values["page"] ?? "1");
+    List<HSMS.Models.Order>? allOrders = ViewBag.Orders as List<HSMS.Models.Order>;
+    var pageSize = 20;
+    var totalCount = allOrders?.Count ?? 0;
+    var totalPages = totalCount > 0 ? (int)Math.Ceiling(totalCount / (double)pageSize) : 1;
+    var pagedOrders = allOrders?.Skip((pageNo - 1) * pageSize).Take(pageSize).ToList();
 }
 
 <div class="container-fluid">
@@ -16,10 +22,10 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <input type="date" name="startDate" class="form-control" value="@DateTime.Today:yyyy-MM-dd">
+                    <input type="date" name="startDate" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")">
                 </div>
                 <div class="col-md-3">
-                    <input type="date" name="endDate" class="form-control" value="@DateTime.Today:yyyy-MM-dd">
+                    <input type="date" name="endDate" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")">
                 </div>
                 <div class="col-md-2">
                     <button type="submit" class="btn btn-primary">Generate</button>
@@ -46,7 +52,7 @@
                     <div class="card bg-success text-white">
                         <div class="card-body">
                             <h5>Total Revenue</h5>
-                            <h3>Rs. @report["TotalRevenue"].ToString("N2")</h3>
+                            <h3>Rs. @String.Format("{0:N2}", report["TotalRevenue"])</h3>
                         </div>
                     </div>
                 </div>
@@ -54,7 +60,7 @@
                     <div class="card bg-warning text-white">
                         <div class="card-body">
                             <h5>Total Discount</h5>
-                            <h3>Rs. @report["TotalDiscount"].ToString("N2")</h3>
+                            <h3>Rs. @String.Format("{0:N2}", report["TotalDiscount"])</h3>
                         </div>
                     </div>
                 </div>
@@ -62,7 +68,7 @@
                     <div class="card bg-info text-white">
                         <div class="card-body">
                             <h5>Total Tax</h5>
-                            <h3>Rs. @report["TotalTax"].ToString("N2")</h3>
+                            <h3>Rs. @String.Format("{0:N2}", report["TotalTax"])</h3>
                         </div>
                     </div>
                 </div>
@@ -73,7 +79,7 @@
                     <div class="card">
                         <div class="card-header">Cash Payments</div>
                         <div class="card-body">
-                            <h4>Rs. @report["CashPayments"].ToString("N2")</h4>
+                            <h4>Rs. @String.Format("{0:N2}", report["CashPayments"])</h4>
                         </div>
                     </div>
                 </div>
@@ -81,7 +87,7 @@
                     <div class="card">
                         <div class="card-header">Card Payments</div>
                         <div class="card-body">
-                            <h4>Rs. @report["CardPayments"].ToString("N2")</h4>
+                            <h4>Rs. @String.Format("{0:N2}", report["CardPayments"])</h4>
                         </div>
                     </div>
                 </div>
@@ -89,7 +95,7 @@
                     <div class="card">
                         <div class="card-header">COD Payments</div>
                         <div class="card-body">
-                            <h4>Rs. @report["CODPayments"].ToString("N2")</h4>
+                            <h4>Rs. @String.Format("{0:N2}", report["CODPayments"])</h4>
                         </div>
                     </div>
                 </div>
@@ -97,9 +103,10 @@
         }
     }
 
-    @if (ViewBag.Orders != null)
+    @if (pagedOrders != null && pagedOrders.Any())
     {
-        <table class="table table-striped mt-4">
+        <p class="text-muted mt-4">Showing @((pageNo-1)*pageSize + 1)-@Math.Min(pageNo*pageSize, totalCount) of @totalCount orders</p>
+        <table class="table table-striped">
             <thead>
                 <tr>
                     <th>Order #</th>
@@ -111,18 +118,38 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var order in (List<HSMS.Models.Order>)ViewBag.Orders)
+                @foreach (var order in pagedOrders)
                 {
                     <tr>
                         <td>@order.OrderNumber</td>
-                        <td>@order.CreatedAt:yyyy-MM-dd HH:mm</td>
+                        <td>@order.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
                         <td>@order.Customer?.FullName</td>
-                        <td>Rs. @order.FinalAmount.ToString("N2")</td>
+                        <td>Rs. @String.Format("{0:N2}", order.FinalAmount)</td>
                         <td>@order.Status</td>
                         <td>@order.PaymentMethod</td>
                     </tr>
                 }
             </tbody>
         </table>
+
+        @if (totalPages > 1)
+        {
+            <nav>
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(pageNo == 1 ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("Sales", new { page = pageNo - 1 })">Previous</a>
+                    </li>
+                    @for (int i = Math.Max(1, pageNo - 2); i <= Math.Min(totalPages, pageNo + 2); i++)
+                    {
+                        <li class="page-item @(i == pageNo ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("Sales", new { page = i })">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(pageNo == totalPages ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("Sales", new { page = pageNo + 1 })">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        }
     }
 </div>

@@ -14,12 +14,14 @@ public class ProductsController : Controller
     private readonly ApplicationDbContext _context;
     private readonly ProductService _productService;
     private readonly IWebHostEnvironment _env;
+    private readonly AuditService _auditService;
 
-    public ProductsController(ApplicationDbContext context, ProductService productService, IWebHostEnvironment env)
+    public ProductsController(ApplicationDbContext context, ProductService productService, IWebHostEnvironment env, AuditService auditService)
     {
         _context = context;
         _productService = productService;
         _env = env;
+        _auditService = auditService;
     }
 
     public async Task<IActionResult> Index(string search)
@@ -28,6 +30,8 @@ public class ProductsController : Controller
             ? await _productService.GetAllProductsAsync()
             : await _productService.SearchProductsAsync(search);
             
+        await _auditService.LogAsync("View", "Products", null, $"Search: {search}");
+        
         ViewBag.Search = search;
         return View(products);
     }
@@ -73,6 +77,7 @@ public class ProductsController : Controller
             var result = await _productService.AddProductAsync(product);
             if (result)
             {
+                await _auditService.LogAsync("Create", "Product", product.Id, $"Added: {product.Name} - {product.Code}");
                 TempData["Success"] = "Product added successfully!";
                 return RedirectToAction(nameof(Index));
             }
@@ -104,6 +109,7 @@ public class ProductsController : Controller
             var result = await _productService.UpdateProductAsync(product);
             if (result)
             {
+                await _auditService.LogAsync("Update", "Product", product.Id, $"Updated: {product.Name}");
                 TempData["Success"] = "Product updated successfully!";
                 return RedirectToAction(nameof(Index));
             }
@@ -128,7 +134,9 @@ public class ProductsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
+        var product = await _productService.GetProductByIdAsync(id);
         await _productService.DeleteProductAsync(id);
+        await _auditService.LogAsync("Delete", "Product", id, $"Deleted: {product?.Name} - {product?.Code}");
         TempData["Success"] = "Product deleted successfully!";
         return RedirectToAction(nameof(Index));
     }

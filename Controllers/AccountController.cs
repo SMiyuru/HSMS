@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using HSMS.Models;
+using HSMS.Services;
 
 namespace HSMS.Controllers;
 
@@ -9,11 +10,13 @@ public class AccountController : Controller
 {
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly AuditService _auditService;
 
-    public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
+    public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, AuditService auditService)
     {
         _signInManager = signInManager;
         _userManager = userManager;
+        _auditService = auditService;
     }
 
     public IActionResult Login(string? returnUrl = null)
@@ -46,6 +49,8 @@ public class AccountController : Controller
 
                 if (result.Succeeded)
                 {
+                    await _auditService.LogAsync("Login", "User", null, $"User logged in: {user.Email}");
+                    
                     if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                         return Redirect(returnUrl);
                     
@@ -105,7 +110,9 @@ public class AccountController : Controller
     [Authorize]
     public async Task<IActionResult> Logout()
     {
+        var userName = User.Identity.Name;
         await _signInManager.SignOutAsync();
+        await _auditService.LogAsync("Logout", "User", null, $"User logged out: {userName}");
         return RedirectToAction("Login", "Account");
     }
 

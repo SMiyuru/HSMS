@@ -1,6 +1,13 @@
 @model List<HSMS.Models.Product>
 @{
     ViewData["Title"] = "Stock Report";
+    var pageNo = Convert.ToInt32(ViewContext.RouteData.Values["page"] ?? "1");
+    var pageSize = 20;
+    var totalCount = Model.Count;
+    var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+    var pagedProducts = Model.Skip((pageNo - 1) * pageSize).Take(pageSize).ToList();
+    var totalValue = pagedProducts.Sum(p => p.SellingPrice * p.CurrentStock);
+    var totalStock = pagedProducts.Sum(p => p.CurrentStock);
 }
 
 <div class="container-fluid">
@@ -8,6 +15,7 @@
     
     <div class="mb-3">
         <a asp-action="ExportToExcel" asp-route-type="Stock" class="btn btn-success">Export to Excel</a>
+        <span class="ms-3 text-muted">@totalCount products</span>
     </div>
 
     <table class="table table-striped">
@@ -23,31 +31,48 @@
             </tr>
         </thead>
         <tbody>
-            @{
-                var totalValue = 0m;
-                var totalStock = 0;
-            }
-            @foreach (var product in Model)
+            @foreach (var product in pagedProducts)
             {
-                totalValue += product.SellingPrice * product.CurrentStock;
-                totalStock += product.CurrentStock;
                 <tr>
                     <td>@product.Code</td>
                     <td>@product.Name</td>
                     <td>@product.Category?.Name</td>
-                    <td>Rs. @product.PurchasePrice.ToString("N2")</td>
-                    <td>Rs. @product.SellingPrice.ToString("N2")</td>
+                    <td>Rs. @String.Format("{0:N2}", product.PurchasePrice)</td>
+                    <td>Rs. @String.Format("{0:N2}", product.SellingPrice)</td>
                     <td>@product.CurrentStock</td>
-                    <td>Rs. @(product.SellingPrice * product.CurrentStock).ToString("N2")</td>
+                    <td>Rs. @String.Format("{0:N2}", product.SellingPrice * product.CurrentStock)</td>
                 </tr>
             }
         </tbody>
         <tfoot>
             <tr class="fw-bold">
-                <td colspan="5">Total</td>
+                <td colspan="5">Total (this page)</td>
                 <td>@totalStock</td>
-                <td>Rs. @totalValue.ToString("N2")</td>
+                <td>Rs. @String.Format("{0:N2}", totalValue)</td>
             </tr>
         </tfoot>
     </table>
+
+    @if (totalPages > 1)
+    {
+        <nav aria-label="Stock pagination">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(pageNo == 1 ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("Stock", new { page = pageNo - 1 })">Previous</a>
+                </li>
+                @for (int i = Math.Max(1, pageNo - 2); i <= Math.Min(totalPages, pageNo + 2); i++)
+                {
+                    <li class="page-item @(i == pageNo ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Stock", new { page = i })">@i</a>
+                    </li>
+                }
+                <li class="page-item @(pageNo == totalPages ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("Stock", new { page = pageNo + 1 })">Next</a>
+                </li>
+            </ul>
+        </nav>
+        <div class="text-center text-muted small">
+            Page @pageNo of @totalPages
+        </div>
+    }
 </div>

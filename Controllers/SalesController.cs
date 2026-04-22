@@ -13,12 +13,14 @@ public class SalesController : Controller
     private readonly ApplicationDbContext _context;
     private readonly ProductService _productService;
     private readonly OrderService _orderService;
+    private readonly AuditService _auditService;
 
-    public SalesController(ApplicationDbContext context, ProductService productService, OrderService orderService)
+    public SalesController(ApplicationDbContext context, ProductService productService, OrderService orderService, AuditService auditService)
     {
         _context = context;
         _productService = productService;
         _orderService = orderService;
+        _auditService = auditService;
     }
 
     [Authorize(Roles = "Admin,Staff")]
@@ -53,6 +55,8 @@ public class SalesController : Controller
         }
 
         var createdOrder = await _orderService.CreateOrderAsync(order);
+        
+        await _auditService.LogAsync("Sale", "Order", createdOrder.Id, $"Total: Rs.{createdOrder.FinalAmount}, Items: {order.OrderItems.Count}");
         
         return Json(new { success = true, orderId = createdOrder.Id, orderNumber = createdOrder.OrderNumber });
     }

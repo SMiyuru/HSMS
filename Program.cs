@@ -37,6 +37,8 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<ReportService>();
+builder.Services.AddScoped<AuditService>();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
 {

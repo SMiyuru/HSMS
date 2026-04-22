@@ -41,6 +41,9 @@
                             <a asp-controller="Reports" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"].ToString() == "Reports" ? "active" : "")">
                                 <i class="bi bi-graph-up"></i> Reports
                             </a>
+                            <a asp-controller="Audit" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"].ToString() == "Audit" ? "active" : "")">
+                                <i class="bi bi-clock-history"></i> Audit Trail
+                            </a>
                         }
                     </nav>
                 </div>
