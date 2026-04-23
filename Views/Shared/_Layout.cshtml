@@ -4,80 +4,240 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"] - HSMS</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf/notyf.min.css">
+
     <style>
-        body { font-family: 'Inter', system-ui, sans-serif; }
-        .sidebar { min-height: 100vh; background: #343a40; color: white; }
-        .sidebar a { color: #adb5bd; text-decoration: none; padding: 10px 15px; display: block; }
-        .sidebar a:hover { background: #495057; color: white; }
-        .sidebar a.active { background: #0d6efd; color: white; }
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+
+        .app-shell {
+            height: 100vh;
+        }
+
+        .app-sidebar {
+            height: 100vh;
+            overflow: hidden;
+            background: #ffffff;
+            border-right: 1px solid #e9ecef;
+        }
+
+        .brand-block {
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .brand-logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            background: #0d6efd;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .brand-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0;
+            color: #212529;
+        }
+
+        .brand-subtitle {
+            font-size: 0.78rem;
+            color: #6c757d;
+            margin-bottom: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0.75rem;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.8rem 0.95rem;
+            margin-bottom: 0.35rem;
+            border-radius: 14px;
+            text-decoration: none;
+            color: #495057;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-link:hover {
+            background: #f1f3f5;
+            color: #212529;
+        }
+
+        .sidebar-link.active {
+            background: #e7f1ff;
+            color: #0d6efd;
+            font-weight: 600;
+        }
+
+        .sidebar-link i {
+            font-size: 1rem;
+        }
+
+        .app-main {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .app-topbar {
+            background: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid #e9ecef;
+            padding: 0.9rem 1.5rem;
+            backdrop-filter: blur(8px);
+        }
+
+        .topbar-title {
+            font-size: 0.95rem;
+            color: #6c757d;
+            margin-bottom: 0;
+        }
+
+        .topbar-user {
+            font-weight: 600;
+            color: #212529;
+        }
+
+        .app-content {
+            padding: 1.5rem;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .logout-btn {
+            border-radius: 10px;
+        }
+
+        @@media (max-width: 767.98px) {
+            .app-content {
+                padding: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
-    @if (User.Identity.IsAuthenticated)
+    @if (User.Identity?.IsAuthenticated == true)
     {
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-2 sidebar p-0">
-                    <div class="p-3 border-bottom border-secondary">
-                        <h5><i class="bi bi-shop"></i> HSMS</h5>
-                    </div>
-                    <nav class="nav flex-column">
-                        <a asp-controller="Dashboard" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"].ToString() == "Dashboard" ? "active" : "")">
-                            <i class="bi bi-speedometer2"></i> Dashboard
-                        </a>
-                        @if (User.IsInRole("Admin") || User.IsInRole("Staff"))
-                        {
-                            <a asp-controller="Sales" asp-action="Counter" class="@(ViewContext.RouteData.Values["action"].ToString() == "Counter" ? "active" : "")">
-                                <i class="bi bi-cart"></i> Counter POS
-                            </a>
-                        }
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <a asp-controller="Products" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"].ToString() == "Products" ? "active" : "")">
-                                <i class="bi bi-box"></i> Products
-                            </a>
-                            <a asp-controller="Reports" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"].ToString() == "Reports" ? "active" : "")">
-                                <i class="bi bi-graph-up"></i> Reports
-                            </a>
-                            <a asp-controller="Audit" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"].ToString() == "Audit" ? "active" : "")">
-                                <i class="bi bi-clock-history"></i> Audit Trail
-                            </a>
-                        }
-                    </nav>
-                </div>
-                <div class="col-md-10">
-                    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
-                        <div class="container-fluid">
-                            <span class="navbar-text">
-                                Welcome, @User.Identity.Name
-                            </span>
-                            <div class="d-flex">
-                                <a asp-controller="Account" asp-action="Logout" class="btn btn-outline-danger btn-sm">Logout</a>
+        <div class="container-fluid app-shell">
+            <div class="row g-0">
+                <aside class="col-md-3 col-lg-2 app-sidebar">
+                    <div class="brand-block">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="brand-logo">
+                                <i class="bi bi-shop"></i>
+                            </div>
+                            <div>
+                                <p class="brand-title">HSMS</p>
+                                <p class="brand-subtitle">Store Management</p>
                             </div>
                         </div>
+                    </div>
+
+                    <nav class="sidebar-nav">
+                        <a asp-controller="Dashboard" asp-action="Index"
+                           class="sidebar-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "active" : "")">
+                            <i class="bi bi-speedometer2"></i>
+                            <span>Dashboard</span>
+                        </a>
+
+                        @if (User.IsInRole("Admin") || User.IsInRole("Staff"))
+                        {
+                            <a asp-controller="Sales" asp-action="Counter"
+                               class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Counter" ? "active" : "")">
+                                <i class="bi bi-cart"></i>
+                                <span>Counter POS</span>
+                            </a>
+                        }
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-controller="Products" asp-action="Index"
+                               class="sidebar-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Products" ? "active" : "")">
+                                <i class="bi bi-box"></i>
+                                <span>Products</span>
+                            </a>
+
+                            <a asp-controller="Reports" asp-action="Index"
+                               class="sidebar-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Reports" ? "active" : "")">
+                                <i class="bi bi-graph-up"></i>
+                                <span>Reports</span>
+                            </a>
+
+                            <a asp-controller="Audit" asp-action="Index"
+                               class="sidebar-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Audit" ? "active" : "")">
+                                <i class="bi bi-clock-history"></i>
+                                <span>Audit Trail</span>
+                            </a>
+                        }
                     </nav>
-                    <div class="p-4">
+                </aside>
+
+                <main class="col-md-9 col-lg-10 app-main">
+                    <div class="app-topbar d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="topbar-title mb-0">Welcome back</p>
+                            <div class="topbar-user">@User.Identity?.Name</div>
+                        </div>
+
+                        <a asp-controller="Account" asp-action="Logout" class="btn btn-outline-danger btn-sm logout-btn">
+                            <i class="bi bi-box-arrow-right me-1"></i>
+                            Logout
+                        </a>
+                    </div>
+
+                    <div class="app-content">
                         @RenderBody()
                     </div>
-                </div>
+                </main>
             </div>
         </div>
     }
     else
     {
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index"><i class="bi bi-shop"></i> HSMS</a>
-                <div class="navbar-nav ms-auto">
-                    <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
-                </div>
-            </div>
-        </nav>
-        <div class="container py-4">
-            @RenderBody()
-        </div>
+        @RenderBody()
+    }
+
+    <script src="https://cdn.jsdelivr.net/npm/notyf/notyf.min.js"></script>
+    <script>
+        const notyf = new Notyf({
+            duration: 3000,
+            position: { x: 'right', y: 'top' }
+        });
+    </script>
+
+    @if (TempData["Success"] != null)
+    {
+        <script>
+            notyf.success(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Success"])));
+        </script>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <script>
+            notyf.error(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Error"])));
+        </script>
     }
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

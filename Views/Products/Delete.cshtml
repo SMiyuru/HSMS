@@ -3,44 +3,133 @@
     ViewData["Title"] = "Delete Product";
 }
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    .delete-page {
+        max-width: 560px;
+        margin: 0 auto;
+    }
 
-<div class="container" style="max-width: 600px;">
-    <div class="card">
-        <div class="card-header bg-danger text-white">
-            <h4>Delete Product</h4>
-        </div>
-        <div class="card-body">
-            <p>Are you sure you want to delete this product?</p>
-            <table class="table table-borderless">
+    .panel-card {
+        background: #fff;
+        border: 1px solid #e9ecef;
+        border-radius: 20px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+    }
+
+    .panel-body {
+        padding: 1.5rem;
+    }
+
+    .danger-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        background: #fdeaea;
+        color: #dc3545;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        margin: 0 auto 0.75rem;
+    }
+
+    .delete-title {
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 0.25rem;
+    }
+
+    .delete-subtitle {
+        text-align: center;
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .info-table {
+        font-size: 0.9rem;
+        margin-bottom: 0;
+    }
+
+    .info-table th {
+        color: #6c757d;
+        font-weight: 600;
+        padding: 0.5rem 0;
+        width: 40%;
+    }
+
+    .info-table td {
+        padding: 0.5rem 0;
+        font-weight: 500;
+    }
+
+    .delete-footer {
+        margin-top: 1.5rem;
+        display: flex;
+        gap: 0.75rem;
+        justify-content: flex-end;
+    }
+
+    .delete-footer .btn {
+        border-radius: 12px;
+        padding: 0.55rem 1rem;
+        font-weight: 600;
+    }
+</style>
+
+<div class="delete-page">
+    <div class="panel-card">
+        <div class="panel-body">
+
+            <!-- Icon -->
+            <div class="danger-icon">
+                <i class="bi bi-trash"></i>
+            </div>
+
+            <!-- Title -->
+            <h4 class="delete-title">Delete Product</h4>
+            <p class="delete-subtitle">
+                This action cannot be undone. Please confirm before deleting.
+            </p>
+
+            <!-- Product Info -->
+            <table class="info-table w-100">
                 <tr>
-                    <th width="40%">Code:</th>
+                    <th>Code</th>
                     <td>@Model.Code</td>
                 </tr>
                 <tr>
-                    <th>Name:</th>
+                    <th>Name</th>
                     <td>@Model.Name</td>
                 </tr>
                 <tr>
-                    <th>Category:</th>
+                    <th>Category</th>
                     <td>@Model.Category?.Name</td>
                 </tr>
                 <tr>
-                    <th>Selling Price:</th>
+                    <th>Selling Price</th>
                     <td>Rs. @Model.SellingPrice.ToString("N2")</td>
                 </tr>
                 <tr>
-                    <th>Stock:</th>
+                    <th>Stock</th>
                     <td>@Model.CurrentStock</td>
                 </tr>
             </table>
-        </div>
-        <div class="card-footer">
-            <form asp-action="Delete" method="post">
+
+            <!-- Actions -->
+            <form asp-action="Delete" method="post" class="delete-footer">
                 <input type="hidden" asp-for="Id" />
-                <button type="submit" class="btn btn-danger">Delete</button>
-                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    Cancel
+                </a>
+
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-trash me-1"></i>
+                    Delete
+                </button>
             </form>
+
         </div>
     </div>
 </div>

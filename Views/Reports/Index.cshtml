@@ -2,57 +2,228 @@
     ViewData["Title"] = "Reports";
 }
 
-<div class="container-fluid">
-    <h2 class="mb-4">Reports</h2>
+<style>
+    .reports-page {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
 
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5>Sales Reports</h5>
-                    <p class="text-muted">Daily, monthly, and custom date range sales reports</p>
-                    <a asp-action="Sales" class="btn btn-primary">View Sales</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5>Stock Report</h5>
-                    <p class="text-muted">Current inventory levels and values</p>
-                    <a asp-action="Stock" class="btn btn-primary">View Stock</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5>Low Stock Alert</h5>
-                    <p class="text-muted">Products below reorder level</p>
-                    <a asp-action="LowStock" class="btn btn-warning">View Low Stock</a>
-                </div>
-            </div>
-        </div>
+    .reports-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #212529;
+        margin-bottom: 0.25rem;
+    }
+
+    .reports-header p {
+        margin-bottom: 0;
+        color: #6c757d;
+    }
+
+    .report-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 1rem;
+    }
+
+    .report-item {
+        grid-column: span 4;
+        background: #ffffff;
+        border: 1px solid #e9ecef;
+        border-radius: 18px;
+        padding: 1.25rem;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+        transition: all 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 210px;
+    }
+
+    .report-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.07);
+        border-color: #dbe4f0;
+    }
+
+    .report-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .report-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        background: #f3f6f9;
+        color: #0d6efd;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .report-arrow {
+        color: #adb5bd;
+        font-size: 0.95rem;
+    }
+
+    .report-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #212529;
+        margin-bottom: 0.45rem;
+    }
+
+    .report-desc {
+        font-size: 0.92rem;
+        color: #6c757d;
+        line-height: 1.5;
+        margin-bottom: 1rem;
+    }
+
+    .report-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        font-weight: 600;
+        color: #0d6efd;
+        text-decoration: none;
+    }
+
+    .report-link:hover {
+        color: #0a58ca;
+    }
+
+    @@media (max-width: 1199.98px) {
+        .report-item {
+            grid-column: span 6;
+        }
+    }
+
+    @@media (max-width: 767.98px) {
+        .report-item {
+            grid-column: span 12;
+            min-height: auto;
+        }
+    }
+</style>
+
+<div class="reports-page">
+    <div class="reports-header">
+        <h2>Reports</h2>
+        <p>View store insights, stock information, and performance summaries.</p>
     </div>
 
-    <div class="row mt-4">
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5>Best Selling Products</h5>
-                    <p class="text-muted">Top performing products by quantity</p>
-                    <a asp-action="BestSelling" class="btn btn-primary">View Best Sellers</a>
+    <div class="report-grid">
+        <div class="report-item">
+            <div>
+                <div class="report-top">
+                    <div class="report-icon">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                    <div class="report-arrow">
+                        <i class="bi bi-arrow-up-right"></i>
+                    </div>
+                </div>
+                <div class="report-title">Sales Reports</div>
+                <div class="report-desc">
+                    Daily, monthly, and custom date range sales reports.
                 </div>
             </div>
+            <a asp-action="Sales" class="report-link">
+                Open report
+                <i class="bi bi-arrow-right"></i>
+            </a>
         </div>
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5>Profit Report</h5>
-                    <p class="text-muted">Revenue, cost, and profit analysis</p>
-                    <a asp-action="Profit" class="btn btn-success">View Profit</a>
+
+        <div class="report-item">
+            <div>
+                <div class="report-top">
+                    <div class="report-icon">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+                    <div class="report-arrow">
+                        <i class="bi bi-arrow-up-right"></i>
+                    </div>
+                </div>
+                <div class="report-title">Stock Report</div>
+                <div class="report-desc">
+                    Current inventory levels, quantities, and stock values.
                 </div>
             </div>
+            <a asp-action="Stock" class="report-link">
+                Open report
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="report-item">
+            <div>
+                <div class="report-top">
+                    <div class="report-icon">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                    <div class="report-arrow">
+                        <i class="bi bi-arrow-up-right"></i>
+                    </div>
+                </div>
+                <div class="report-title">Low Stock Alert</div>
+                <div class="report-desc">
+                    Products that are below reorder level and need attention.
+                </div>
+            </div>
+            <a asp-action="LowStock" class="report-link">
+                Open report
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="report-item">
+            <div>
+                <div class="report-top">
+                    <div class="report-icon">
+                        <i class="bi bi-star"></i>
+                    </div>
+                    <div class="report-arrow">
+                        <i class="bi bi-arrow-up-right"></i>
+                    </div>
+                </div>
+                <div class="report-title">Best Selling Products</div>
+                <div class="report-desc">
+                    Top performing products based on quantity sold.
+                </div>
+            </div>
+            <a asp-action="BestSelling" class="report-link">
+                Open report
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="report-item">
+            <div>
+                <div class="report-top">
+                    <div class="report-icon">
+                        <i class="bi bi-cash-stack"></i>
+                    </div>
+                    <div class="report-arrow">
+                        <i class="bi bi-arrow-up-right"></i>
+                    </div>
+                </div>
+                <div class="report-title">Profit Report</div>
+                <div class="report-desc">
+                    Revenue, cost, and profit analysis for store performance.
+                </div>
+            </div>
+            <a asp-action="Profit" class="report-link">
+                Open report
+                <i class="bi bi-arrow-right"></i>
+            </a>
         </div>
     </div>
 </div>

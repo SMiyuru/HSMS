@@ -2,25 +2,124 @@
     ViewData["Title"] = "Home";
 }
 
-<div class="container-fluid">
-    <div class="row justify-content-center align-items-center" style="min-height: 70vh;">
-        <div class="col-md-8 text-center">
-            <h1 class="display-4 mb-4">Hardware Store Management System</h1>
-            <p class="lead mb-4">Welcome to HSMS - Your complete hardware store solution</p>
-            
-            @if (!User.Identity.IsAuthenticated)
-            {
-                <div class="mt-4">
-                    <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg mx-2">Login</a>
-                    <a asp-controller="Account" asp-action="Register" class="btn btn-outline-secondary btn-lg mx-2">Register</a>
+<div class="container py-5">
+    <div class="row align-items-center justify-content-center" style="min-height: 75vh;">
+        <div class="col-lg-10">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <div class="pe-lg-4">
+                        <span class="badge bg-primary-subtle text-primary px-3 py-2 mb-3 border">
+                            Hardware Store Management System
+                        </span>
+
+                        <h1 class="display-4 fw-bold mb-3 text-dark">
+                            Manage your hardware store with clarity and control
+                        </h1>
+
+                        <p class="lead text-muted mb-4">
+                            HSMS helps you handle products, sales, stock levels, reporting, and daily operations
+                            from one simple and professional dashboard.
+                        </p>
+
+                        <div class="d-flex flex-wrap gap-3 mb-4">
+                            <div class="bg-light border rounded-3 px-3 py-2">
+                                <strong>Inventory</strong>
+                                <div class="text-muted small">Track products and stock</div>
+                            </div>
+                            <div class="bg-light border rounded-3 px-3 py-2">
+                                <strong>Sales</strong>
+                                <div class="text-muted small">Manage orders efficiently</div>
+                            </div>
+                            <div class="bg-light border rounded-3 px-3 py-2">
+                                <strong>Reports</strong>
+                                <div class="text-muted small">View business insights</div>
+                            </div>
+                        </div>
+
+                        @if (!User.Identity.IsAuthenticated)
+                        {
+                            <div class="d-flex flex-wrap gap-3">
+                                <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg px-4">
+                                    Login
+                                </a>
+                                <a asp-controller="Account" asp-action="Register" class="btn btn-outline-secondary btn-lg px-4">
+                                    Register
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="d-flex flex-wrap gap-3">
+                                <a asp-controller="Dashboard" asp-action="Index" class="btn btn-primary btn-lg px-4">
+                                    Go to Dashboard
+                                </a>
+                            </div>
+                        }
+                    </div>
                 </div>
-            }
-            else
-            {
-                <div class="mt-4">
-                    <a asp-controller="Dashboard" asp-action="Index" class="btn btn-primary btn-lg">Go to Dashboard</a>
+
+                <div class="col-lg-6">
+                    <div class="card shadow-sm border-0 rounded-4">
+                        <div class="card-body p-4 p-md-5">
+                            <div class="mb-4">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="bg-primary rounded-circle me-3" style="width: 12px; height: 12px;"></div>
+                                    <h5 class="mb-0 fw-semibold">Why choose HSMS?</h5>
+                                </div>
+                                <p class="text-muted mb-0">
+                                    A clean and practical system designed to support smooth hardware store operations.
+                                </p>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <div class="border rounded-3 p-3">
+                                        <h6 class="fw-semibold mb-1">Product Management</h6>
+                                        <p class="text-muted mb-0 small">
+                                            Organize products, categories, suppliers, and stock details easily.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="border rounded-3 p-3">
+                                        <h6 class="fw-semibold mb-1">Sales Monitoring</h6>
+                                        <p class="text-muted mb-0 small">
+                                            Handle transactions and follow store performance with confidence.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="border rounded-3 p-3">
+                                        <h6 class="fw-semibold mb-1">Smart Reporting</h6>
+                                        <p class="text-muted mb-0 small">
+                                            Review important business data and low-stock items quickly.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4" />
+
+                            <div class="d-flex justify-content-between text-center">
+                                <div>
+                                    <h5 class="fw-bold text-primary mb-1">Fast</h5>
+                                    <small class="text-muted">Simple workflow</small>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold text-primary mb-1">Clean</h5>
+                                    <small class="text-muted">Professional UI</small>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold text-primary mb-1">Reliable</h5>
+                                    <small class="text-muted">Daily use ready</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            }
+            </div>
         </div>
-    </div>
+     </div>
 </div>

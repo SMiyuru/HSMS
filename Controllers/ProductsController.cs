@@ -29,9 +29,9 @@ public class ProductsController : Controller
         var products = string.IsNullOrEmpty(search)
             ? await _productService.GetAllProductsAsync()
             : await _productService.SearchProductsAsync(search);
-            
+
         await _auditService.LogAsync("View", "Products", null, $"Search: {search}");
-        
+
         ViewBag.Search = search;
         return View(products);
     }
@@ -41,15 +41,19 @@ public class ProductsController : Controller
         var product = await _productService.GetProductByIdAsync(id);
         if (product == null)
             return NotFound();
-            
+
         return View(product);
     }
 
     public IActionResult Create()
     {
-        ViewData["CategoryId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(_context.Categories.Where(c => c.IsActive), "Id", "Name");
-        ViewData["SupplierId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(_context.Suppliers.Where(s => s.IsActive), "Id", "Name");
-        return View();
+        ViewData["CategoryId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(
+            _context.Categories.Where(c => c.IsActive), "Id", "Name");
+
+        ViewData["SupplierId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(
+            _context.Suppliers.Where(s => s.IsActive), "Id", "Name");
+
+        return PartialView("_CreateModal", new Product());
     }
 
     [HttpPost]
@@ -62,31 +66,39 @@ public class ProductsController : Controller
             {
                 var fileName = $"{Guid.NewGuid()}{Path.GetExtension(productImage.FileName)}";
                 var uploadsFolder = Path.Combine(_env.WebRootPath ?? "wwwroot", "uploads");
+
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);
                 }
+
                 var filePath = Path.Combine(uploadsFolder, fileName);
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await productImage.CopyToAsync(stream);
                 }
+
                 product.ImageUrl = $"/uploads/{fileName}";
             }
 
             var result = await _productService.AddProductAsync(product);
+
             if (result)
             {
-                await _auditService.LogAsync("Create", "Product", product.Id, $"Added: {product.Name} - {product.Code}");
                 TempData["Success"] = "Product added successfully!";
-                return RedirectToAction(nameof(Index));
+                return Json(new { success = true });
             }
+
             ModelState.AddModelError("Code", "Product code already exists");
         }
-        
-        ViewData["CategoryId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(_context.Categories.Where(c => c.IsActive), "Id", "Name", product.CategoryId);
-        ViewData["SupplierId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(_context.Suppliers.Where(s => s.IsActive), "Id", "Name", product.SupplierId);
-        return View(product);
+
+        ViewData["CategoryId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(
+            _context.Categories.Where(c => c.IsActive), "Id", "Name", product.CategoryId);
+
+        ViewData["SupplierId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(
+            _context.Suppliers.Where(s => s.IsActive), "Id", "Name", product.SupplierId);
+
+        return PartialView("_CreateModal", product);
     }
 
     public async Task<IActionResult> Edit(int id)
@@ -94,7 +106,7 @@ public class ProductsController : Controller
         var product = await _productService.GetProductByIdAsync(id);
         if (product == null)
             return NotFound();
-            
+
         ViewData["CategoryId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(_context.Categories.Where(c => c.IsActive), "Id", "Name", product.CategoryId);
         ViewData["SupplierId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(_context.Suppliers.Where(s => s.IsActive), "Id", "Name", product.SupplierId);
         return View(product);
@@ -115,7 +127,7 @@ public class ProductsController : Controller
             }
             ModelState.AddModelError("Code", "Product code already exists");
         }
-        
+
         ViewData["CategoryId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(_context.Categories.Where(c => c.IsActive), "Id", "Name", product.CategoryId);
         ViewData["SupplierId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(_context.Suppliers.Where(s => s.IsActive), "Id", "Name", product.SupplierId);
         return View(product);
@@ -126,7 +138,7 @@ public class ProductsController : Controller
         var product = await _productService.GetProductByIdAsync(id);
         if (product == null)
             return NotFound();
-            
+
         return View(product);
     }
 

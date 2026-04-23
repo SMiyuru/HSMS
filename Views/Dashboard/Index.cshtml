@@ -5,154 +5,330 @@
     var lowStockCount = ViewBag.LowStockCount;
 }
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<div class="container-fluid">
-    <h2 class="mb-4">Dashboard</h2>
+<style>
+    .dashboard-page {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
 
-    <div class="row">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Today's Sales</h5>
-                    <h2 class="mb-0">Rs. @todaySales?.ToString("N2")</h2>
+    .dashboard-header h2 {
+        font-weight: 700;
+        margin-bottom: 0.35rem;
+        color: #212529;
+    }
+
+    .dashboard-header p {
+        margin-bottom: 0;
+        color: #6c757d;
+    }
+
+    .metric-card {
+        background: #fff;
+        border: 1px solid #e9ecef;
+        border-radius: 20px;
+        padding: 1.25rem;
+        height: 100%;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+    }
+
+    .metric-label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #6c757d;
+        margin-bottom: 0.75rem;
+    }
+
+    .metric-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #212529;
+        line-height: 1.2;
+        margin-bottom: 0;
+    }
+
+    .metric-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+
+    .metric-icon.primary {
+        background: #e7f1ff;
+        color: #0d6efd;
+    }
+
+    .metric-icon.success {
+        background: #eaf7ee;
+        color: #198754;
+    }
+
+    .metric-icon.warning {
+        background: #fff4db;
+        color: #f59f00;
+    }
+
+    .metric-icon.info {
+        background: #e7f7fb;
+        color: #0dcaf0;
+    }
+
+    .panel-card {
+        background: #fff;
+        border: 1px solid #e9ecef;
+        border-radius: 20px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+        height: 100%;
+    }
+
+    .panel-header {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #eef1f4;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .panel-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #212529;
+        margin: 0;
+    }
+
+    .panel-body {
+        padding: 1.25rem;
+    }
+
+    .table-clean {
+        margin-bottom: 0;
+    }
+
+    .table-clean thead th {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #6c757d;
+        border-bottom-width: 1px;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+    }
+
+    .table-clean tbody td {
+        vertical-align: middle;
+        padding-top: 0.85rem;
+        padding-bottom: 0.85rem;
+    }
+
+    .stock-badge {
+        display: inline-block;
+        min-width: 42px;
+        text-align: center;
+        padding: 0.3rem 0.55rem;
+        border-radius: 999px;
+        background: #fdeaea;
+        color: #dc3545;
+        font-weight: 700;
+        font-size: 0.82rem;
+    }
+
+    .quick-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .quick-links .btn {
+        border-radius: 12px;
+        padding: 0.65rem 1rem;
+        font-weight: 600;
+    }
+
+    .empty-state {
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+
+    .chart-wrap {
+        position: relative;
+        width: 100%;
+    }
+
+    .chart-wrap.chart-lg {
+        min-height: 320px;
+    }
+
+    .chart-wrap.chart-sm {
+        min-height: 320px;
+    }
+
+    @@media (max-width: 991.98px) {
+        .metric-value {
+            font-size: 1.5rem;
+        }
+
+        .chart-wrap.chart-lg,
+        .chart-wrap.chart-sm {
+            min-height: 280px;
+        }
+    }
+</style>
+
+<div class="dashboard-page">
+    <div class="dashboard-header">
+        <h2>Dashboard</h2>
+        <p>Overview of today’s performance, stock status, and sales activity.</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6 col-xl-3">
+            <div class="metric-card">
+                <div class="metric-icon primary">
+                    <i class="bi bi-cash-stack"></i>
+                </div>
+                <div class="metric-label">Today's Sales</div>
+                <h3 class="metric-value">Rs. @todaySales?.ToString("N2")</h3>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="metric-card">
+                <div class="metric-icon success">
+                    <i class="bi bi-receipt"></i>
+                </div>
+                <div class="metric-label">Today's Orders</div>
+                <h3 class="metric-value">@todayOrders</h3>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="metric-card">
+                <div class="metric-icon warning">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <div class="metric-label">Low Stock Items</div>
+                <h3 class="metric-value">@lowStockCount</h3>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="metric-card">
+                <div class="metric-icon info">
+                    <i class="bi bi-person"></i>
+                </div>
+                <div class="metric-label">Active User</div>
+                <h3 class="metric-value" style="font-size: 1.1rem;">@User.Identity?.Name</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-xl-8">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h5 class="panel-title">Sales Trend (Last 7 Days)</h5>
+                </div>
+                <div class="panel-body">
+                    <div class="chart-wrap chart-lg">
+                        <canvas id="salesChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Today's Orders</h5>
-                    <h2 class="mb-0">@todayOrders</h2>
+
+        <div class="col-xl-4">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h5 class="panel-title">Sales by Category</h5>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Low Stock Items</h5>
-                    <h2 class="mb-0">@lowStockCount</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Active User</h5>
-                    <h2 class="mb-0" style="font-size: 1.2rem;">@User.Identity.Name</h2>
+                <div class="panel-body">
+                    <div class="chart-wrap chart-sm">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row mt-4">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Sales Trend (Last 7 Days)</h5>
+    <div class="row g-4">
+        <div class="col-xl-6">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h5 class="panel-title">Low Stock Products</h5>
                 </div>
-                <div class="card-body">
-                    <canvas id="salesChart" height="100"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Sales by Category</h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="categoryChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row mt-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Low Stock Products</h5>
-                </div>
-                <div class="card-body">
+                <div class="panel-body">
                     @if (ViewBag.LowStockProducts != null && ((List<HSMS.Models.Product>)ViewBag.LowStockProducts).Any())
                     {
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Code</th>
-                                    <th>Name</th>
-                                    <th>Stock</th>
-                                    <th>Reorder</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var product in (List<HSMS.Models.Product>)ViewBag.LowStockProducts)
-                                {
+                        <div class="table-responsive">
+                            <table class="table table-clean">
+                                <thead>
                                     <tr>
-                                        <td>@product.Code</td>
-                                        <td>@product.Name</td>
-                                        <td class="text-danger fw-bold">@product.CurrentStock</td>
-                                        <td>@product.ReorderLevel</td>
+                                        <th>Code</th>
+                                        <th>Name</th>
+                                        <th>Stock</th>
+                                        <th>Reorder</th>
                                     </tr>
-                                }
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @foreach (var product in (List<HSMS.Models.Product>)ViewBag.LowStockProducts)
+                                    {
+                                        <tr>
+                                            <td>@product.Code</td>
+                                            <td>@product.Name</td>
+                                            <td><span class="stock-badge">@product.CurrentStock</span></td>
+                                            <td>@product.ReorderLevel</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     }
                     else
                     {
-                        <p class="text-muted">No low stock products</p>
+                        <p class="empty-state">No low stock products.</p>
                     }
                 </div>
             </div>
         </div>
 
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Top Selling Products</h5>
+        <div class="col-xl-6">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h5 class="panel-title">Top Selling Products</h5>
                 </div>
-                <div class="card-body">
+                <div class="panel-body">
                     @if (ViewBag.TopProducts != null && ((List<HSMS.Models.Product>)ViewBag.TopProducts).Any())
                     {
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Category</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var product in (List<HSMS.Models.Product>)ViewBag.TopProducts)
-                                {
+                        <div class="table-responsive">
+                            <table class="table table-clean">
+                                <thead>
                                     <tr>
-                                        <td>@product.Name</td>
-                                        <td>@product.Category?.Name</td>
+                                        <th>Product</th>
+                                        <th>Category</th>
                                     </tr>
-                                }
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @foreach (var product in (List<HSMS.Models.Product>)ViewBag.TopProducts)
+                                    {
+                                        <tr>
+                                            <td>@product.Name</td>
+                                            <td>@product.Category?.Name</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     }
                     else
                     {
-                        <p class="text-muted">No sales data yet</p>
+                        <p class="empty-state">No sales data yet.</p>
                     }
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Quick Links</h5>
-                </div>
-                <div class="card-body">
-                    <a asp-controller="Products" asp-action="Create" class="btn btn-primary">Add Product</a>
-                    <a asp-controller="Sales" asp-action="Counter" class="btn btn-success">Counter POS</a>
-                    <a asp-controller="Reports" asp-action="Index" class="btn btn-info">Reports</a>
                 </div>
             </div>
         </div>
@@ -172,34 +348,55 @@
             datasets: [{
                 label: 'Sales (Rs.)',
                 data: salesData,
-                borderColor: 'rgb(54, 162, 235)',
-                backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                borderColor: '#0d6efd',
+                backgroundColor: 'rgba(13, 110, 253, 0.08)',
                 fill: true,
-                tension: 0.3
+                tension: 0.35,
+                borderWidth: 2
             }, {
                 label: 'Orders',
                 data: orderCount,
-                borderColor: 'rgb(75, 192, 192)',
-                backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                borderColor: '#20c997',
+                backgroundColor: 'rgba(32, 201, 151, 0.08)',
                 fill: true,
-                tension: 0.3,
+                tension: 0.35,
+                borderWidth: 2,
                 yAxisID: 'y1'
             }]
         },
         options: {
+            maintainAspectRatio: false,
             responsive: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        usePointStyle: true
+                    }
+                }
+            },
             scales: {
                 y: {
                     type: 'linear',
                     display: true,
                     position: 'left',
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)'
+                    },
                     title: { display: true, text: 'Sales (Rs.)' }
                 },
                 y1: {
                     type: 'linear',
                     display: true,
                     position: 'right',
+                    grid: {
+                        drawOnChartArea: false
+                    },
                     title: { display: true, text: 'Orders' }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
                 }
             }
         }
@@ -207,7 +404,7 @@
 
     var categoryLabels = @Html.Raw(Json.Serialize(ViewBag.CategoryLabels));
     var categoryData = @Html.Raw(Json.Serialize(ViewBag.CategoryData));
-    var colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
+    var colors = ['#0d6efd', '#20c997', '#ffc107', '#6f42c1', '#fd7e14'];
 
     var ctx2 = document.getElementById('categoryChart').getContext('2d');
     new Chart(ctx2, {
@@ -216,11 +413,23 @@
             labels: categoryLabels,
             datasets: [{
                 data: categoryData,
-                backgroundColor: colors
+                backgroundColor: colors,
+                borderWidth: 0
             }]
         },
         options: {
-            responsive: true
+            maintainAspectRatio: false,
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 16
+                    }
+                }
+            },
+            cutout: '68%'
         }
     });
 </script>
