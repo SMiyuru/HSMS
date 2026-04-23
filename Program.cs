@@ -1,11 +1,19 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 using HSMS.Data;
 using HSMS.Models;
 using HSMS.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+if (builder.Environment.IsProduction())
+{
+    builder.Environment.EnvironmentName = "Development";
+}
+
+builder.WebHost.UseUrls("http://0.0.0.0:5000", "https://0.0.0.0:7000");
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
@@ -82,5 +90,15 @@ app.MapControllerRoute(
     name: "default",
     pattern: "/{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
+
+if (app.Environment.IsDevelopment())
+{
+    var url = "http://localhost:5000";
+    Task.Run(() =>
+    {
+        Thread.Sleep(2000);
+        Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+    });
+}
 
 app.Run();

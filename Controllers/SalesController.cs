@@ -38,27 +38,35 @@ public class SalesController : Controller
 
     [Authorize(Roles = "Admin,Staff")]
     [HttpPost]
-    public async Task<IActionResult> CreateCounterOrder([FromBody] Order order)
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> CreateCounterOrder([FromForm] Order order)
     {
-        if (order.OrderItems == null || !order.OrderItems.Any())
+        try
         {
-            return Json(new { success = false, message = "No items in cart" });
+            if (order == null)
+            {
+                return Json(new { success = false, message = "Invalid request - order is null" });
+            }
+            
+            if (order.OrderItems == null || order.OrderItems.Count == 0)
+            {
+                return Json(new { success = false, message = "No items in cart" });
+            }
+
+            order.OrderType = OrderType.Counter;
+            order.StaffId = _context.Users.FirstOrDefault(u => u.UserName == User.Identity.Name)?.Id;
+            order.Status = OrderStatus.Confirmed;
+
+            var createdOrder = await _orderService.CreateOrderAsync(order);
+            
+            await _auditService.LogAsync("Sale", "Order", createdOrder.Id, $"Total: Rs.{createdOrder.FinalAmount}, Items: {order.OrderItems.Count}");
+            
+            return Json(new { success = true, orderId = createdOrder.Id, orderNumber = createdOrder.OrderNumber });
         }
-
-        order.OrderType = OrderType.Counter;
-        order.StaffId = _context.Users.FirstOrDefault(u => u.UserName == User.Identity.Name)?.Id;
-        order.Status = OrderStatus.Confirmed;
-
-        foreach (var item in order.OrderItems)
+        catch (Exception ex)
         {
-            item.Product = await _context.Products.FindAsync(item.ProductId);
+            return Json(new { success = false, message = "Error: " + ex.Message });
         }
-
-        var createdOrder = await _orderService.CreateOrderAsync(order);
-        
-        await _auditService.LogAsync("Sale", "Order", createdOrder.Id, $"Total: Rs.{createdOrder.FinalAmount}, Items: {order.OrderItems.Count}");
-        
-        return Json(new { success = true, orderId = createdOrder.Id, orderNumber = createdOrder.OrderNumber });
     }
 
     [Authorize(Roles = "Admin,Staff")]
@@ -88,6 +96,25 @@ public class SalesController : Controller
         if (order == null)
             return NotFound();
         return View(order);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> GetInvoiceByNumber([FromForm] string orderNumber)
+    {
+        if (string.IsNullOrEmpty(orderNumber))
+            return Json(new { success = false, message = "Invoice number required" });
+        
+        var order = await _orderService.GetOrderByNumberAsync(orderNumber);
+        if (order == null)
+            return Json(new { success = false, message = "Invoice not found" });
+        
+        return Json(new { 
+            success = true, 
+            orderId = order.Id, 
+            orderNumber = order.OrderNumber,
+            finalAmount = order.FinalAmount,
+            createdAt = order.CreatedAt.ToString("yyyy-MM-dd HH:mm")
+        });
     }
 
     public async Task<IActionResult> GetOrders(string search, string type)

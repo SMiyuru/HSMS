@@ -60,15 +60,15 @@ public static class SeedData
             // Power Tools
             products.AddRange(new[] {
                 new Product { Code = "PT001", Name = "Cordless Drill 18V", CategoryId = catPowerTools, PurchasePrice = 8500, SellingPrice = 12500, CurrentStock = 25, ReorderLevel = 10, SupplierId = 1 },
-                new Product { Code = "PT002", Name = "Cordless Drill 12V", CategoryId = catPowerTools, PurchasePrice = 6500, SellingPrice = 9500, CurrentStock = 30, ReorderLevel = 10, SupplierId = 1 },
-                new Product { Code = "PT003", Name = "Impact Driver 18V", CategoryId = catPowerTools, PurchasePrice = 9200, SellingPrice = 13500, CurrentStock = 18, ReorderLevel = 8, SupplierId = 1 },
-                new Product { Code = "PT004", Name = "Circular Saw 7.25 inch", CategoryId = catPowerTools, PurchasePrice = 7500, SellingPrice = 11000, CurrentStock = 15, ReorderLevel = 5, SupplierId = 1 },
+                new Product { Code = "PT002", Name = "Cordless Drill 12V", CategoryId = catPowerTools, PurchasePrice = 6500, SellingPrice = 9500, CurrentStock = 30, ReorderLevel = 15, SupplierId = 1 },
+                new Product { Code = "PT003", Name = "Impact Driver 18V", CategoryId = catPowerTools, PurchasePrice = 9200, SellingPrice = 13500, CurrentStock = 18, ReorderLevel = 10, SupplierId = 1 },
+                new Product { Code = "PT004", Name = "Circular Saw 7.25 inch", CategoryId = catPowerTools, PurchasePrice = 7500, SellingPrice = 11000, CurrentStock = 15, ReorderLevel = 20, SupplierId = 1 },
                 new Product { Code = "PT005", Name = "Angle Grinder 4.5 inch", CategoryId = catPowerTools, PurchasePrice = 4500, SellingPrice = 6800, CurrentStock = 40, ReorderLevel = 15, SupplierId = 1 },
-                new Product { Code = "PT006", Name = "Angle Grinder 5 inch", CategoryId = catPowerTools, PurchasePrice = 5200, SellingPrice = 7800, CurrentStock = 35, ReorderLevel = 12, SupplierId = 1 },
-                new Product { Code = "PT007", Name = "Orbital Sander", CategoryId = catPowerTools, PurchasePrice = 3800, SellingPrice = 5500, CurrentStock = 22, ReorderLevel = 8, SupplierId = 1 },
-                new Product { Code = "PT008", Name = "Jigsaw", CategoryId = catPowerTools, PurchasePrice = 5500, SellingPrice = 8200, CurrentStock = 12, ReorderLevel = 5, SupplierId = 1 },
-                new Product { Code = "PT009", Name = "Rotary Hammer Drill", CategoryId = catPowerTools, PurchasePrice = 12500, SellingPrice = 18500, CurrentStock = 8, ReorderLevel = 5, SupplierId = 1 },
-                new Product { Code = "PT010", Name = "Heat Gun 2000W", CategoryId = catPowerTools, PurchasePrice = 3500, SellingPrice = 5200, CurrentStock = 20, ReorderLevel = 8, SupplierId = 1 },
+                new Product { Code = "PT006", Name = "Angle Grinder 5 inch", CategoryId = catPowerTools, PurchasePrice = 5200, SellingPrice = 7800, CurrentStock = 35, ReorderLevel = 10, SupplierId = 1 },
+                new Product { Code = "PT007", Name = "Orbital Sander", CategoryId = catPowerTools, PurchasePrice = 3800, SellingPrice = 5500, CurrentStock = 22, ReorderLevel = 20, SupplierId = 1 },
+                new Product { Code = "PT008", Name = "Jigsaw", CategoryId = catPowerTools, PurchasePrice = 5500, SellingPrice = 8200, CurrentStock = 12, ReorderLevel = 15, SupplierId = 1 },
+                new Product { Code = "PT009", Name = "Rotary Hammer Drill", CategoryId = catPowerTools, PurchasePrice = 12500, SellingPrice = 18500, CurrentStock = 8, ReorderLevel = 10, SupplierId = 1 },
+                new Product { Code = "PT010", Name = "Heat Gun 2000W", CategoryId = catPowerTools, PurchasePrice = 3500, SellingPrice = 5200, CurrentStock = 20, ReorderLevel = 20, SupplierId = 1 },
             });
             context.Products.AddRange(products);
             await context.SaveChangesAsync();

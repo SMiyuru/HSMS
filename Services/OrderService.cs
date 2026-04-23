@@ -59,6 +59,16 @@ public class OrderService
             .FirstOrDefaultAsync(o => o.Id == id);
     }
 
+    public async Task<Order?> GetOrderByNumberAsync(string orderNumber)
+    {
+        return await _context.Orders
+            .Include(o => o.Customer)
+            .Include(o => o.Staff)
+            .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Product)
+            .FirstOrDefaultAsync(o => o.OrderNumber == orderNumber);
+    }
+
     public async Task<Order> CreateOrderAsync(Order order)
     {
         order.OrderNumber = GenerateOrderNumber();
@@ -66,7 +76,10 @@ public class OrderService
 
         foreach (var item in order.OrderItems)
         {
-            item.UnitPrice = item.Product?.SellingPrice ?? 0;
+            var product = await _context.Products.FindAsync(item.ProductId);
+            if (product == null) continue;
+            
+            item.UnitPrice = product.SellingPrice;
             item.TotalPrice = item.UnitPrice * item.Quantity;
 
             if (order.OrderType == OrderType.Counter || 
@@ -136,6 +149,8 @@ public class OrderService
 
     private string GenerateOrderNumber()
     {
-        return $"ORD-{DateTime.Now:yyyyMMdd}-{Guid.NewGuid().ToString("N")[..6].ToUpper()}";
+        var today = DateTime.Today;
+        var count = _context.Orders.Count(o => o.CreatedAt.Date == today) + 1;
+        return $"ORD{today:yyyyMMdd}-{count:D4}";
     }
 }

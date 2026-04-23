@@ -263,9 +263,9 @@
                 </form>
 
                 <div class="toolbar-actions">
-                    <a asp-action="Create" class="btn btn-success">
+                    <button class="btn btn-success" onclick="openCreateModal()">
                         <i class="bi bi-plus-lg me-2"></i>Add Product
-                    </a>
+                    </button>
                 </div>
             </div>
 
@@ -316,6 +316,7 @@
                             <th>Purchase Price</th>
                             <th>Selling Price</th>
                             <th>Stock</th>
+                            <th>Reorder Level</th>
                             <th>Supplier</th>
                             <th>Actions</th>
                         </tr>
@@ -348,6 +349,7 @@
                                         @product.CurrentStock
                                     </span>
                                 </td>
+                                <td>@product.ReorderLevel</td>
                                 <td>@product.Supplier?.Name</td>
                                 <td>
                                     <div class="action-group">
@@ -370,3 +372,51 @@
         </div>
     </div>
 </div>
+
+<!-- Create Product Modal -->
+<div class="modal fade" id="createProductModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h4 class="modal-title fw-bold">Add New Product</h4>
+                <button type="button" class="btn-close" onclick="closeCreateModal()"></button>
+            </div>
+            <div class="modal-body" id="createModalContent">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openCreateModal() {
+        var modal = new bootstrap.Modal(document.getElementById('createProductModal'));
+        modal.show();
+        
+        fetch('@Url.Action("Create", "Products")', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('createModalContent').innerHTML = html;
+        })
+        .catch(err => {
+            document.getElementById('createModalContent').innerHTML = '<div class="text-center text-danger">Error loading form</div>';
+        });
+    }
+    
+    function closeCreateModal() {
+        var modalEl = document.getElementById('createProductModal');
+        var modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) {
+            modal.hide();
+        }
+        modalEl.addEventListener('hidden.bs.modal', function() {
+            document.getElementById('createModalContent').innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+        }, { once: true });
+    }
+</script>
